@@ -25,6 +25,7 @@ class _HomeState extends State<Home> {
   late Position position;
   String long = "", lat = "";
   late StreamSubscription<Position> positionStream;
+  late Timer timer;
 
   @override
   void initState() {
@@ -85,9 +86,9 @@ class _HomeState extends State<Home> {
       //device must move horizontally before an update event is generated;
     );
 
-    StreamSubscription<Position> positionStream =
-        Geolocator.getPositionStream(locationSettings: locationSettings)
-            .listen((Position position) {
+    timer = Timer.periodic(Duration(seconds: 3), (timer) async {
+      position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       print(position.longitude); //Output: 80.24599079
       print(position.latitude); //Output: 29.6593457
 
@@ -117,5 +118,10 @@ class _HomeState extends State<Home> {
                 style: TextStyle(fontSize: 20),
               )
             ])));
+  }
+
+  @override
+  void dispose() {
+    timer.cancel(); //cancel timer when the widget
   }
 }
